@@ -1,3 +1,5 @@
+% Adicionar teste para irmãos que tenham mesmo pai e mae
+
 parent(pam,bob).
 parent(tom,bob).
 parent(tom,liz).
