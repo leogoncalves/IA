@@ -1,13 +1,13 @@
 """
 
 + hill climbing: apresentar o número de execuções
- do programa até que uma solução seja alcançada 
+ do programa até que uma solução seja alcançada
  (ou seja, o número de tabuleiros iniciais aleatórios
   gerados até uma solução ser encontrada) e o número
   médio de tabuleiro correntes em cada execução
 
-+ simulated annealing: os parâmetros usados (temperatura inicial, 
-número máximo de iterações e alfa) que permitem encontrar 
++ simulated annealing: os parâmetros usados (temperatura inicial,
+número máximo de iterações e alfa) que permitem encontrar
 uma solução sempre que o simulated annealing é executado.
 
 """
@@ -16,33 +16,33 @@ uma solução sempre que o simulated annealing é executado.
 import random
 
 
-
 """
 
 Define o tamanho do tabuleiro
 
 """
-board_size = 4
+board_size = 32
 
 
 """
 
-Define a posição das rainhas em um tabuleiro, 
-onde o índice é a coluna do tabuleiro e o 
+Define a posição das rainhas em um tabuleiro,
+onde o índice é a coluna do tabuleiro e o
 valor é a linha em que a rainha está posicionada
 
 """
+
+
 def generate_board(board_size):
     return [random.randint(0, board_size - 1) for i in range(board_size)]
 
-# board = generate_board(board_size)
-board = [1,2,3,2]
 
+board = generate_board(board_size)
+#board = [1, 2, 3, 2]
 """
-
 Calcula o valor do quadro atual
-
 """
+
 
 def heuristica(board):
     h = 0
@@ -56,89 +56,65 @@ def heuristica(board):
 
 
 """
-
-Método utilitário para ver o tabuleiro
-
+Método utilitário para calcular as heurísticas
+ao mover as rainhas pelo tabuleiro e retornar as opções
 """
 
-def show_board(board):
-    display = [0 for a in range(board_size)]
+
+def calculate_neighbours(board):
+    options = ['X' for a in range(board_size)]
+    h_atual = heuristica(board)
+    menor_valor = h_atual
+
     for i in range(board_size):
         row = [0 for i in range(board_size)]
-        menor_valor = 99999
+
         for j in range(board_size):
+
             if(j == board[i]):
                 row[j] = 'Q'
             else:
-                mock_board = [j if a == i else board[a] for a in range(board_size)]
-                row[j] = heuristica(mock_board)
-                if row[j] < menor_valor:
-                    menor_valor = row[j]
-                    display[i] = j
-        print(row)
-    print(display)
+                mock_board = [j if a == i else board[a]
+                              for a in range(board_size)]
+                h = heuristica(mock_board)
+                row[j] = h
+
+                if h < menor_valor:
+                    menor_valor = h
+                    options = [j if i == a else 'X' for a in range(board_size)]
+                elif h == menor_valor:
+                    options[i] = j
+    print('\nopções:', options)
+    return options
+
+
+def get_indexes(options):
+    return [idx for idx in range(board_size) if options[idx] != 'X']
+
 
 print(board)
-print(heuristica(board))
-show_board(board)
+print('h(board):', heuristica(board), '\n')
+options = calculate_neighbours(board)
 
+for i in range(1, 1000):
+    if (options.count('X') == board_size):
+        print('Resultado encontrado em %i interações' % (i-1))
+        break
 
+    print('\nRODADA', i)
 
+    indexes = get_indexes(options)
 
+    if (len(indexes) > 1):
+        ind = indexes[random.randint(0, len(indexes) - 1)]
+    else:
+        ind = indexes[0]
 
+    board[ind] = options[ind]
 
-
-# class ChessBoard:
-    
-#     def __init__(self, size):
-#         self.size = size
-#         self.chess_board = []
-
-#     def generate_chess_board(self):
-#         size = self.size
-#         chess_board = [[0] * size for i in range(size)]
-#         for row in chess_board:
-#             position = random.randrange(0,size, 1)
-#             row[position] = 'Q'        
-#         self.chess_board = chess_board
-
-#     def show_board(self):
-#         board = self.chess_board
-#         for row in board:
-#             print(row)
-
-#     def number_of_attacks(self):
-#         board = self.chess_board 
-#         board_size = self.size
-#         custo = 0
-#         for row in range(board_size):
-#             for column in range(board_size):
-#                 if(board[row][column] == 'Q'):
-#                     custo += self.calculator(board, row, column, row+1)
-#                 else:
-#                     board[row][column] = self.calculator(board, row, column, 0)
-#         print(custo)
-#         return custo
-    
-#     def calculator(self, board, row, column, init_row = 0):
-#         board_size = self.size
-#         custo = 0
-#         for row2 in range(init_row, board_size):
-#             for column2 in range(board_size):
-#                 if(board[row2][column2] == 'Q'):
-#                     if ((column == column2) or (abs(column2 - column) == abs(row2 - row))):
-#                         custo += 1
-#         return custo
-
-# if __name__ == "__ChessBoard__":
-#     ChessBoard()
-
-
-
-# chess = ChessBoard(4)
-# chess.generate_chess_board()
-# chess.number_of_attacks()
-# chess.show_board()
+    print(board)
+    print('h(board):', heuristica(board), '\n')
+    options = calculate_neighbours(board)
 
 """
 
